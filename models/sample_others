@@ -1,0 +1,42 @@
+select round(sum(spend) / sum(engagements),2) as engagement_cost from {{ref('src_promoted_tweets_twitter_all_data')}}
+;
+
+
+select round(sum(spend) / sum (comments + shares + views + mobile_app_install + inline_link_clicks), 2) as engagement_cost from {{ref('src_ads_creative_facebook_all_data')}}
+;
+
+
+select sum(impressions) as Impressions_by_channel from {{ref('src_promoted_tweets_twitter_all_data')}}
+group by channel
+;
+
+
+select sum(impressions) as Impressions_by_channel from {{ref('src_ads_tiktok_ads_all_data')}}
+group by channel
+;
+
+
+select sum(impressions) as Impressions_by_channel from {{ref('src_ads_creative_facebook_all_data')}}
+group by channel
+;
+
+select 0 as Impressions_by_channel from {{ref('src_ads_bing_all_data')}}
+group by channel
+;
+
+
+select round(sum(spend) / sum(clicks), 2) as CPC from {{ref('src_promoted_tweets_twitter_all_data')}}
+group by channel
+;
+
+select round(sum(spend) / sum(clicks), 2) as CPC from {{ref('src_ads_bing_all_data')}}
+group by channel
+;
+
+select round(sum(spend) / sum(clicks), 2) as CPC from {{ref('src_ads_creative_facebook_all_data')}}
+group by channel
+;
+
+select round(sum(spend) / sum(clicks), 2) as CPC from {{ref('src_ads_tiktok_ads_all_data')}}
+group by channel
+;
