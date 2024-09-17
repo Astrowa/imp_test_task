@@ -151,11 +151,14 @@ Impressions_by_channel as (
 Cost_per_engage as (
     select data_model.channel,
     ROUND(
-            sum(data_model.spend) / sum(data_model.comments + data_model.shares + data_model.views + data_model.mobile_app_install + data_model.inline_link_clicks), 2
-        ) AS engagement_cost,
-        round(
-        sum(data_model.spend) / sum(tw.engagements), 2
-        ) as engagement_cost
+        CASE 
+            WHEN data_model.channel = 'Facebook' THEN 
+                sum(data_model.spend) / sum(data_model.comments + data_model.shares + data_model.views + data_model.mobile_app_install + data_model.inline_link_clicks)
+            WHEN data_model.channel = 'Twitter' THEN 
+                sum(data_model.spend) / sum(tw.engagements)
+            ELSE 
+                0
+        END, 2) AS engagement_cost
     from data_model
     LEFT JOIN {{ ref('src_promoted_tweets_twitter_all_data') }} as tw ON tw.__insert_date = data_model.__insert_date and tw.campaign_id = data_model.campaign_id
     group by data_model.channel
@@ -170,9 +173,7 @@ CPC as (
 
 
 
-select * from Cost_per_engage
-
-
-
-
-
+select cc.channel, Conversion_cost_by_channel, ibc.Impressions_by_channel, CPC.CPC, cpe.engagement_cost from Conversion_cost cc
+join Impressions_by_channel ibc on ibc.channel = cc.channel
+join CPC on CPC.channel = cc.channel
+join Cost_per_engage as cpe on cpe.channel = cc.channel
